@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 
@@ -18,13 +18,15 @@ export default function App() {
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar style="light" backgroundColor="#25292e" />
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#FFFFFF' }}>
-        Teste de atualização
-      </Text>
-      <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
-        ({tempoAtual.toLocaleTimeString()})
-      </Text>
-      <Button></Button>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }} style={{ width: '100%' }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#FFFFFF' }}>
+          Teste de atualização
+        </Text>
+        <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
+          ({tempoAtual.toLocaleTimeString()})
+        </Text>
+        <Button></Button>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

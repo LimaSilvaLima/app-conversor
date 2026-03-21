@@ -4,7 +4,7 @@ import { colors } from '../../styles/colors';
 
 export const styles =StyleSheet.create({
     button: {
-        backgroundColor: colors.inputBackgound,
+        backgroundColor: colors.inputBackground,
         paddingHorizontal: 16,
         paddingVertical: 8,
         margin: 4,
@@ -22,4 +22,3 @@ export const styles =StyleSheet.create({
         backgroundColor: colors.secondary,
     },
 });
-

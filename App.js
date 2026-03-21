@@ -1,35 +1,30 @@
+import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Text, KeyboardAvoidingView, Platform } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 
-
-
 export default function App() {
+  const [tempoAtual, setTempoAtual] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTempoAtual(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer); // Limpa o timer se o componente desmontar
+  }, []);
+
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView style={styles.ScrollView}>
-        <View style={styles.container}>
-        <StatusBar style="light" />
-
-            <View style={styles.content}>
-              <Text style={styles.title}>Conversor de Moedas</Text>
-              <Text style={styles.subTitle}>
-                Converta valores entre diferentes moedas
-              </Text>
-            </View>
-
-            <View style={styles.header}>
-              <Text style={styles.label}>Digite o valor a ser convertido</Text>
-            </View>
-
-            <View>
-              <Button variant='secondary' ></Button>
-            </View>
-
-          
-        </View>
-      </ScrollView>
+    <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <StatusBar style="light" backgroundColor="#25292e" />
+      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#FFFFFF' }}>
+        Teste de atualização
+      </Text>
+      <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
+        ({tempoAtual.toLocaleTimeString()})
+      </Text>
+      <Button></Button>
     </KeyboardAvoidingView>
   );
 }

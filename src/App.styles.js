@@ -10,10 +10,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 24,
         paddingTop: 80,
-        paddingBottom: 24
+        paddingBottom: 24,
     },
     header: {
-        marginBottom: 32,
+      marginBottom: 32
     },
     card : {
         backgroundColor: colors.cardBackground,

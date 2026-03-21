@@ -19,8 +19,8 @@ export default function App() {
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar style="light" backgroundColor="#25292e" />
       <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
-        <View>
-          <View style={styles.content}>
+        <View style={styles.container}>
+          <View style={styles.header}>
             <Text style={styles.title}>Conversor de Moedas</Text>
             <Text style={styles.subtitle}>
               Converta valores entre diferentes moedas
@@ -28,8 +28,11 @@ export default function App() {
           </View>
           <View style={styles.header}>
               <Text style={styles.label}>Digite o valor a ser convertido</Text>
-            </View>
-          <Button></Button>
+          </View>
+          <View style={styles.card}>
+            <Text style={styles.label}>De: </Text>
+            <Button variant='secondary' title="Converter" />
+          </View>
           <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
             ({tempoAtual.toLocaleTimeString()})
           </Text>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Text, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 
@@ -18,14 +18,22 @@ export default function App() {
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar style="light" backgroundColor="#25292e" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }} style={{ width: '100%' }}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#FFFFFF' }}>
-          Teste de atualização
-        </Text>
-        <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
-          ({tempoAtual.toLocaleTimeString()})
-        </Text>
-        <Button></Button>
+      <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
+        <View>
+          <View style={styles.content}>
+            <Text style={styles.title}>Conversor de Moedas</Text>
+            <Text style={styles.subtitle}>
+              Converta valores entre diferentes moedas
+            </Text>
+          </View>
+          <View style={styles.header}>
+              <Text style={styles.label}>Digite o valor a ser convertido</Text>
+            </View>
+          <Button></Button>
+          <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
+            ({tempoAtual.toLocaleTimeString()})
+          </Text>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

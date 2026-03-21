@@ -6,7 +6,6 @@ function Button({variant = 'primary', onPress, title }) {
     <TouchableOpacity onPress={onPress} style={[
       styles.button,
         variant === 'primary' ? styles.buttonPrimary : styles.buttonSecondary
-      
     ]}>
       <Text style={styles.buttonText}>{title || 'Clique aqui'}</Text>
     </TouchableOpacity>

@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
+import { currencies } from './src/constants/currencies';
 
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
@@ -31,6 +32,11 @@ export default function App() {
           </View>
           <View style={styles.card}>
             <Text style={styles.label}>De: </Text>
+            <View>
+              {currencies.map((currency) => (
+                <Text key={currency.code} style={styles.subtitle}>{currency.name} ({currency.symbol})</Text>
+              ))}
+            </View>
             <Button variant='secondary' title="Converter" />
           </View>
           <Text style={{ fontSize: 18, color: '#FFFFFF' }}>

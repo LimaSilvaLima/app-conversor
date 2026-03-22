@@ -1,7 +1,7 @@
 import { TouchableOpacity, Text } from 'react-native';
 import { styles } from './styles';
 
-function Button({variant = 'primary', onPress, title }) {
+function Button({variant = 'primary', onPress, title, currency}) {
   return (
     <TouchableOpacity onPress={onPress} style={[
       styles.button,

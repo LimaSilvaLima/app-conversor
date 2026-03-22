@@ -34,7 +34,7 @@ export default function App() {
             <Text style={styles.label}>De: </Text>
             <View>
               {currencies.map((currency) => (
-                <Text key={currency.code} style={styles.subtitle}>{currency.name} ({currency.symbol})</Text>
+                <Button key={currency.code} title={`${currency.name} (${currency.symbol})`} />
               ))}
             </View>
             <Button variant='secondary' title="Converter" />

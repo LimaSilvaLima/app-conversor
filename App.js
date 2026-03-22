@@ -34,7 +34,10 @@ export default function App() {
             <Text style={styles.label}>De: </Text>
             <View>
               {currencies.map((currency) => (
-                <Button variant='primary' key={currency.code} currency={currency} />
+                <Button variant='primary' key={currency.code}
+                 currency={currency}
+                 >
+                 </Button> 
               ))}
             </View>
             <Button variant='secondary' title="Converter" />

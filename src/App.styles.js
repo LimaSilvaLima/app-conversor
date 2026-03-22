@@ -43,7 +43,16 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         width: '100%',
-    }
+    },
+    currencyGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -4,
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    
+
 });
 
 export default styles

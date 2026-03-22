@@ -32,7 +32,7 @@ export default function App() {
           </View>
           <View style={styles.card}>
             <Text style={styles.label}>De: </Text>
-            <View>
+            <View style={styles.currencyGrid}>
               {currencies.map((currency) => (
                 <Button variant='primary' key={currency.code}
                  currency={currency}

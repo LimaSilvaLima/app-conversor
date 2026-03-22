@@ -20,7 +20,7 @@ export default function App() {
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar style="light" backgroundColor="#25292e" />
       <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
-        <View style={styles.container}>
+        <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
           <View style={styles.header}>
             <Text style={styles.title}>Conversor de Moedas</Text>
             <Text style={styles.subtitle}>
@@ -34,7 +34,7 @@ export default function App() {
             <Text style={styles.label}>De: </Text>
             <View>
               {currencies.map((currency) => (
-                <Button key={currency.code} title={`${currency.name} (${currency.symbol})`} />
+                <Button variant='primary' key={currency.code} currency={currency} />
               ))}
             </View>
             <Button variant='secondary' title="Converter" />

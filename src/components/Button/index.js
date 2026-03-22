@@ -7,7 +7,9 @@ function Button({variant = 'primary', onPress, title, currency}) {
       styles.button,
         variant === 'primary' ? styles.buttonPrimary : styles.buttonSecondary
     ]}>
-      <Text style={styles.buttonText}>{title || 'Clique aqui'}</Text>
+      <Text style={styles.buttonText}>
+        {title ? title : `${currency.code} - ${currency.name} (${currency.symbol})`}
+      </Text>
     </TouchableOpacity>
   );
 } 

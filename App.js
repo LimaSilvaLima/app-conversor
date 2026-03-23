@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Text, KeyboardAvoidingView, Platform, ScrollView, View, TouchableOpacity } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 import { currencies } from './src/constants/currencies';
@@ -41,9 +41,25 @@ export default function App() {
                  </Button> 
               ))}
             </View>
-            <Input lable="valor: " />
-            <Button variant='secondary' title="Converter" />
           </View>
+          <Input label="valor: " />
+            <TouchableOpacity style={styles.swapButton}>
+              <Text style={styles.swapButtonText}>
+                ↑↓
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.label}>Para:</Text>
+            <View style={styles.currencyGrid}>
+              {currencies.map((currency) => (
+                <Button variant='secondary' key={currency.code}
+                 currency={currency}
+                 >
+                 </Button> 
+              ))}
+            </View>
+
+            
+          
           <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
             ({tempoAtual.toLocaleTimeString()})
           </Text>

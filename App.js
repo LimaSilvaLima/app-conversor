@@ -4,6 +4,7 @@ import { Text, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-na
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 import { currencies } from './src/constants/currencies';
+import { Input } from './src/components/Input';
 
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
@@ -40,6 +41,7 @@ export default function App() {
                  </Button> 
               ))}
             </View>
+            <Input lable="valor: " />
             <Button variant='secondary' title="Converter" />
           </View>
           <Text style={{ fontSize: 18, color: '#FFFFFF' }}>

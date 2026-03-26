@@ -5,9 +5,15 @@ import Button from './src/components/Button';
 import styles from './src/App.styles';
 import { currencies } from './src/constants/currencies';
 import { Input } from './src/components/Input';
+import { ResultCard } from './src/components/ResultCard';
+import { exchangeRateApi } from './src/services/api';
 
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
+  const [valorInput, setValorInput] = useState('1');
+  const [resultado, setResultado] = useState(null);
+  const [moedaOrigem, setMoedaOrigem] = useState('BRL');
+  const [moedaDestino, setMoedaDestino] = useState('USD');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -16,6 +22,18 @@ export default function App() {
 
     return () => clearInterval(timer); // Limpa o timer se o componente desmontar
   }, []);
+
+  async function fetchExchangeRate() {
+    try {
+      const data = await exchangeRateApi(moedaOrigem);
+      const taxa = data.rates[moedaDestino];
+      const calculo = parseFloat(valorInput) * taxa;
+      
+      setResultado(calculo.toFixed(2));
+    } catch (error) {
+      console.warn('Não foi possível buscar a cotação:', error.message);
+    }
+  }
 
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -42,28 +60,40 @@ export default function App() {
               ))}
             </View>
           </View>
-          <Input label="valor: " />
-            <TouchableOpacity style={styles.swapButton}>
-              <Text style={styles.swapButtonText}>
-                ↑↓
-              </Text>
-            </TouchableOpacity>
-            <Text style={styles.label}>Para:</Text>
-            <View style={styles.currencyGrid}>
-              {currencies.map((currency) => (
-                <Button variant='secondary' key={currency.code}
-                 currency={currency}
-                 >
-                 </Button> 
-              ))}
+          <View style={styles.card}>
+            <Input 
+              label="valor: " 
+              value={valorInput}
+              onChangeText={setValorInput}
+            />
+              <TouchableOpacity style={styles.swapButton}>
+                <Text style={styles.swapButtonText}>
+                  ↑↓
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.card}>
+                <Text style={styles.label}>Para:</Text>
+                </View>
+                  <View style={styles.currencyGrid}>
+                    {currencies.map((currency) => (
+                      <Button variant='secondary' key={currency.code}
+                      currency={currency}
+                      >
+                      </Button> 
+                    ))}
+                  </View>                                                                                                                                                                
+                  <TouchableOpacity style={styles.convertButton}
+                  onPress={fetchExchangeRate}>
+                    <Text style={styles.swapButtonText}>
+                      Converter
+                    </Text>
+                  </TouchableOpacity>
+                  {resultado && <ResultCard valor={resultado} moeda={moedaDestino} />}
             </View>
-
-            
-          
-          <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
+        </View>
+        <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
             ({tempoAtual.toLocaleTimeString()})
           </Text>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

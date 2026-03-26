@@ -54,17 +54,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     swapButton: {
-        backgroundColor: colors.inputBackground,
+        backgroundColor: colors.secondary,
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+        marginBottom: 24
+    },
+    convertButton: {
+        backgroundColor: colors.secondary,
         paddingVertical: 16,
         paddingHorizontal: 24,
         borderRadius: 12,
         marginBottom: 24
     },
     swapButtonText: {
-        color: '#ffffff',
+        color: '#ffffff',  
         fontSize: 16,
         textAlign: 'center',
         fontWeight: '600'
+    },
+    convertButtonDisabled: {    
+        backgroundColor: colors.disabled,
+        opacity: 0.5
     }
     
 

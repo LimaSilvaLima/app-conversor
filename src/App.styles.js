@@ -76,6 +76,20 @@ const styles = StyleSheet.create({
     convertButtonDisabled: {    
         backgroundColor: colors.disabled,
         opacity: 0.5
+    },
+    resultCard: {
+        backgroundColor: colors.primary + '20',
+        padding: 24,
+        borderRadius: 16,
+        width: '100%',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.primary
+    },
+    resultText: {
+        color: colors.text,
+        fontSize: 24,
+        fontWeight: 'bold'
     }
     
 

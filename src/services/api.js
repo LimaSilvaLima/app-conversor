@@ -15,7 +15,7 @@ export async function exchangeRateApi(fromCurrency) {
             console.error("A API não retornou JSON. Resposta recebida:", text.substring(0, 100));
             throw new Error("Resposta do servidor inválida (não é JSON).");
         }
-
+        // É necessário parsear a resposta para JSON e atribuí-la à variável 'data'
         const data = await response.json();
         return data;
     } catch (error) {

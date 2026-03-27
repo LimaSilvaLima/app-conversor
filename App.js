@@ -10,17 +10,19 @@ import { exchangeRateApi } from './src/services/api';
 
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
+  const [amount, setAmount] = useState('');
   const [valorInput, setValorInput] = useState('1');
   const [resultado, setResultado] = useState(null);
-  const [amount, setAmount] = useState('');
   const [fromCurrency, setFromCurrency] = useState('BRL');
   const [toCurrency, setToCurrency] = useState('USD');
-  const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(null);
-  const [moedaOrigem, setMoedaOrigem] = useState('BRL');
-  const [moedaDestino, setMoedaDestino] = useState('USD');
 
+  // Função para inverter as moedas de origem e destino
+  function handleSwap() {
+    const temp = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(temp);
+    setResultado(null); // Limpa o resultado ao inverter
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,15 +34,19 @@ export default function App() {
 
   async function fetchExchangeRate() {
     try {
-      const data = await exchangeRateApi(moedaOrigem);
-      const taxa = data.rates[moedaDestino];
-      const calculo = parseFloat(valorInput) * taxa;
       
-      setResultado(calculo.toFixed(2));
+      const data = await exchangeRateApi(fromCurrency);
+      const rate = data.rates[toCurrency];
+      const calculatedResult = parseFloat(amount) * rate;
+      setResultado(calculatedResult.toFixed(2));
+      console.log('Taxa de câmbio:', rate);
+      
     } catch (error) {
       console.warn('Não foi possível buscar a cotação:', error.message);
     }
   }
+
+  
 
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -55,34 +61,34 @@ export default function App() {
           </View>
           <View style={styles.header}>
               <Text style={styles.label}>Digite o valor a ser convertido</Text>
-          </View>
+      </View>
           <View style={styles.card}>
-            <Text style={styles.label}>De: </Text>
+            <Text style={styles.label}>De:</Text>
             <View style={styles.currencyGrid}>
               {currencies.map((currency) => (
-                <Button variant='primary' key={currency.code}
-                 currency={currency}
-                  onPress={() => setFromCurrency(currency.code)}
-                  isSelected={fromCurrency === currency.code}
-                 >
-                 </Button> 
+            <Button
+              variant="primary"
+              key={currency.code}
+              currency={currency}
+              onPress={() => setFromCurrency(currency.code)}
+              isSelected={fromCurrency === currency.code}
+            />
               ))}
             </View>
           </View>
           <View style={styles.card}>
             <Input 
               label="valor: " 
-              value={valorInput}
-              onChangeText={setValorInput}
+              value={amount}
+              onChangeText={setAmount}
             />
-              <TouchableOpacity style={styles.swapButton}>
+              <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
                 <Text style={styles.swapButtonText}>
                   ↑↓
                 </Text>
               </TouchableOpacity>
-              <View style={styles.card}>
-                <Text style={styles.label}>Para:</Text>
-                </View>
+
+              <Text style={styles.label}>Para:</Text>
                   <View style={styles.currencyGrid}>
                     {currencies.map((currency) => (
                       <Button variant='secondary' key={currency.code}
@@ -99,12 +105,12 @@ export default function App() {
                       Converter
                     </Text>
                   </TouchableOpacity>
-                  {resultado && <ResultCard valor={resultado} moeda={moedaDestino} />}
+                  {resultado && <ResultCard valor={resultado} moeda={toCurrency} />}
             </View>
         </View>
-        <Text style={{ fontSize: 18, color: '#FFFFFF' }}>
+        <Text style={{ fontSize: 14, color: '#888', marginTop: 20 }}>
             ({tempoAtual.toLocaleTimeString()})
-          </Text>
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

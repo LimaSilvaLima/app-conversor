@@ -7,6 +7,7 @@ import { currencies } from './src/constants/currencies';
 import { Input } from './src/components/Input';
 import { ResultCard } from './src/components/ResultCard';
 import { exchangeRateApi } from './src/services/api';
+import { convertCurrency } from './src/utils/convertCurrency';
 
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
@@ -37,9 +38,9 @@ export default function App() {
       
       const data = await exchangeRateApi(fromCurrency);
       const rate = data.rates[toCurrency];
-      const calculatedResult = parseFloat(amount) * rate;
-      setResultado(calculatedResult.toFixed(2));
-      console.log('Taxa de câmbio:', rate);
+      const convertedAmount = convertCurrency(amount, rate);
+      setResultado(convertedAmount);
+      console.log(convertedAmount)
       
     } catch (error) {
       console.warn('Não foi possível buscar a cotação:', error.message);

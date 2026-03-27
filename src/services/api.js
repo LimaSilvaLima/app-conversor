@@ -1,14 +1,11 @@
 const BASE_URL = 'https://api.exchangerate-api.com/v4/latest';
 
 export async function exchangeRateApi(fromCurrency) {
-
     try {
         const response = await fetch(`${BASE_URL}/${fromCurrency}`);
-        
         if (!response.ok) {
             throw new Error(`Erro na requisição: ${response.status}`);
         }
-
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
             const text = await response.text();
@@ -22,5 +19,4 @@ export async function exchangeRateApi(fromCurrency) {
         console.error('Error fetching exchange rate:', error);
         throw error;
     }
-   
 }

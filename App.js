@@ -12,8 +12,15 @@ export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
   const [valorInput, setValorInput] = useState('1');
   const [resultado, setResultado] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [fromCurrency, setFromCurrency] = useState('BRL');
+  const [toCurrency, setToCurrency] = useState('USD');
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(null);
   const [moedaOrigem, setMoedaOrigem] = useState('BRL');
   const [moedaDestino, setMoedaDestino] = useState('USD');
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -55,6 +62,8 @@ export default function App() {
               {currencies.map((currency) => (
                 <Button variant='primary' key={currency.code}
                  currency={currency}
+                  onPress={() => setFromCurrency(currency.code)}
+                  isSelected={fromCurrency === currency.code}
                  >
                  </Button> 
               ))}
@@ -78,6 +87,8 @@ export default function App() {
                     {currencies.map((currency) => (
                       <Button variant='secondary' key={currency.code}
                       currency={currency}
+                      onPress ={() => setToCurrency(currency.code)}
+                      isSelected={toCurrency === currency.code}
                       >
                       </Button> 
                     ))}

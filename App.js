@@ -12,17 +12,17 @@ import { convertCurrency } from './src/utils/convertCurrency';
 export default function App() {
   const [tempoAtual, setTempoAtual] = useState(new Date());
   const [amount, setAmount] = useState('');
-  const [valorInput, setValorInput] = useState('1');
-  const [resultado, setResultado] = useState(null);
+  const [result, setResult] = useState(null);
   const [fromCurrency, setFromCurrency] = useState('BRL');
   const [toCurrency, setToCurrency] = useState('USD');
+  const [exchangeRate, setExchangeRate] = useState(null);
 
   // Função para inverter as moedas de origem e destino
   function handleSwap() {
     const temp = fromCurrency;
     setFromCurrency(toCurrency);
     setToCurrency(temp);
-    setResultado(null); // Limpa o resultado ao inverter
+    setResult(null); // Limpa o resultado ao inverter
   }
 
   useEffect(() => {
@@ -38,8 +38,9 @@ export default function App() {
       
       const data = await exchangeRateApi(fromCurrency);
       const rate = data.rates[toCurrency];
+      setExchangeRate(rate);
       const convertedAmount = convertCurrency(amount, rate);
-      setResultado(convertedAmount);
+      setResult(convertedAmount);
       console.log(convertedAmount)
       
     } catch (error) {
@@ -106,7 +107,14 @@ export default function App() {
                       Converter
                     </Text>
                   </TouchableOpacity>
-                  {resultado && <ResultCard valor={resultado} moeda={toCurrency} />}
+                  <ResultCard 
+                    amount={amount} 
+                    fromCurrency={fromCurrency} 
+                    toCurrency={toCurrency} 
+                    exchangeRate={exchangeRate} 
+                    result={result}
+                    currencies={currencies}
+                  />
             </View>
         </View>
         <Text style={{ fontSize: 14, color: '#888', marginTop: 20 }}>

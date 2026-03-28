@@ -54,6 +54,14 @@ export default function App() {
       setLoading(false);
     }
   }
+
+  function swapCurrencies() {
+    const temp = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(temp);
+    setResult(null); // Limpa o resultado ao inverter
+  }
+
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar style="light" backgroundColor="#25292e" />
@@ -88,7 +96,7 @@ export default function App() {
               value={amount}
               onChangeText={setAmount}
             />
-              <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
+              <TouchableOpacity style={styles.swapButton} onPress={swapCurrencies}>
                 <Text style={styles.swapButtonText}>
                   ↑↓
                 </Text>

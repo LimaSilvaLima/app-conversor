@@ -1,8 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { colors } from "../../styles/colors";
 
-
-
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -12,7 +10,7 @@ export const styles = StyleSheet.create({
     },
     label: {
         color: colors.textSecondary,
-        fontSize: 14,
+        fontSize: 20,
         marginBottom: 8,
         fontWeight: 'bold'
     },

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../constants/colors';
+import { colors } from "../../styles/colors";
 
 
 
@@ -24,9 +24,8 @@ export const styles = StyleSheet.create({
         marginBottom: 14,
     },
     rate: {
-        color: colors.secondary,
+        color: colors.textSecondary,
         fontSize: 14,
-        marginTop: 8,
     },
     
 });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, KeyboardAvoidingView, Platform, ScrollView, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Text, KeyboardAvoidingView, Platform, ScrollView, View, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
 import Button from './src/components/Button';
 import styles from './src/App.styles';
 import { currencies } from './src/constants/currencies';
@@ -18,8 +18,7 @@ export default function App() {
   const [exchangeRate, setExchangeRate] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Função para inverter as moedas de origem e destino
-  function handleSwap() {
+  function swapCurrencies() {
     const temp = fromCurrency;
     setFromCurrency(toCurrency);
     setToCurrency(temp);
@@ -49,22 +48,21 @@ export default function App() {
       console.log(convertedAmount)
       
     } catch (error) {
-      console.warn('Não foi possível buscar a cotação:', error.message);
+      console.error('Erro na conversão:', error);
+      alert('Erro ao buscar cotação. Verifique sua conexão.');
     } finally {
       setLoading(false);
     }
   }
 
-  function swapCurrencies() {
-    const temp = fromCurrency;
-    setFromCurrency(toCurrency);
-    setToCurrency(temp);
-    setResult(null); // Limpa o resultado ao inverter
-  }
-
   return (
-    <KeyboardAvoidingView style={[styles.container, { backgroundColor: '#25292e' }]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <StatusBar style="light" backgroundColor="#25292e" />
+    <ImageBackground 
+      source={require('./assets/Converti.png')} 
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
         <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
           <View style={styles.header}>
@@ -139,6 +137,7 @@ export default function App() {
             ({tempoAtual.toLocaleTimeString()})
         </Text>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }

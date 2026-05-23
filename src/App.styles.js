@@ -4,19 +4,19 @@ import { colors } from "./styles/colors";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background
+    //backgroundColor: colors.background
   },
   content: {
         flex: 1,
         paddingHorizontal: 24,
         paddingTop: 80,
         paddingBottom: 24
-    },
+    },  
     header: {
       marginBottom: 32
     },
     card : {
-        backgroundColor: colors.cardBackground,
+        //backgroundColor: colors.cardBackground,
         borderRadius: 16,
         padding: 22,
         marginBottom: 24

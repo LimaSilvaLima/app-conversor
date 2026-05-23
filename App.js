@@ -57,7 +57,7 @@ export default function App() {
 
   return (
     <ImageBackground 
-      source={require('./assets/Converti.png')} 
+      source={require('./assets/background/Converti.png')} 
       style={styles.container}
       resizeMode="cover"
     >

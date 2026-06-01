@@ -1,143 +1,92 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import { StatusBar } from 'expo-status-bar';
-import { Text, KeyboardAvoidingView, Platform, ScrollView, View, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
-import Button from './src/components/Button';
-import styles from './src/App.styles';
-import { currencies } from './src/constants/currencies';
-import { Input } from './src/components/Input';
-import { ResultCard } from './src/components/ResultCard';
-import { exchangeRateApi } from './src/services/api';
-import { convertCurrency } from './src/utils/convertCurrency';
+import { MaterialIcons } from '@expo/vector-icons';
+
+// Importação das 3 telas isoladas
+import HomeScreen from './src/screens/HomeScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+
+import { colors } from './src/styles/colors';
 
 export default function App() {
-  const [tempoAtual, setTempoAtual] = useState(new Date());
-  const [amount, setAmount] = useState('');
-  const [result, setResult] = useState(null);
-  const [fromCurrency, setFromCurrency] = useState('BRL');
-  const [toCurrency, setToCurrency] = useState('USD');
-  const [exchangeRate, setExchangeRate] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('Início');
+  
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+  });
 
-  function swapCurrencies() {
-    const temp = fromCurrency;
-    setFromCurrency(toCurrency);
-    setToCurrency(temp);
-    setResult(null); // Limpa o resultado ao inverter
-  }
+  if (!fontsLoaded) return null;
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTempoAtual(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer); // Limpa o timer se o componente desmontar
-  }, []);
-
-  async function fetchExchangeRate() {
-    setLoading(true);
-    try {
-      if (!amount || isNaN(amount)) {
-        alert('Por favor, insira um valor numérico válido para conversão.');
-        return;
-      }
-      const data = await exchangeRateApi(fromCurrency);
-      const rate = data.rates[toCurrency];
-      setExchangeRate(rate);
-      const convertedAmount = convertCurrency(amount, rate);
-      setResult(convertedAmount);
-      console.log(convertedAmount)
-      
-    } catch (error) {
-      console.error('Erro na conversão:', error);
-      alert('Erro ao buscar cotação. Verifique sua conexão.');
-    } finally {
-      setLoading(false);
+  // Função para renderizar a tela correta baseada no estado
+  const renderScreen = () => {
+    switch (currentTab) {
+      case 'Início': return <HomeScreen />;
+      case 'Perfil': return <ProfileScreen />;
+      case 'Config': return <SettingsScreen />;
+      default: return <HomeScreen />;
     }
-  }
+  };
 
   return (
-    <ImageBackground 
-      source={require('./assets/background/Converti.png')} 
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
-        <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Conversor de Moedas</Text>
-            <Text style={styles.subtitle}>
-              Converta valores entre diferentes moedas
-            </Text>
-          </View>
-          <View style={styles.header}>
-              <Text style={styles.label}>Digite o valor a ser convertido</Text>
+    <View style={styles.container}>
+      <StatusBar style="light" />
+      
+      {/* Área Dinâmica da Tela */}
+      <View style={styles.content}>
+        {renderScreen()}
       </View>
-          <View style={styles.card}>
-            <Text style={styles.label}>De:</Text>
-            <View style={styles.currencyGrid}>
-              {currencies.map((currency) => (
-            <Button
-              variant="primary"
-              key={currency.code}
-              currency={currency}
-              onPress={() => setFromCurrency(currency.code)}
-              isSelected={fromCurrency === currency.code}
-            />
-              ))}
-            </View>
-          </View>
-          <View style={styles.card}>
-            <Input 
-              label="valor: " 
-              value={amount}
-              onChangeText={setAmount}
-            />
-              <TouchableOpacity style={styles.swapButton} onPress={swapCurrencies}>
-                <Text style={styles.swapButtonText}>
-                  ↑↓
-                </Text>
-              </TouchableOpacity>
 
-              <Text style={styles.label}>Para:</Text>
-                  <View style={styles.currencyGrid}>
-                    {currencies.map((currency) => (
-                      <Button variant='secondary' key={currency.code}
-                      currency={currency}
-                      onPress ={() => setToCurrency(currency.code)}
-                      isSelected={toCurrency === currency.code}
-                      >
-                      </Button> 
-                    ))}
-                  </View>                                                                                                                                                                
-                  <TouchableOpacity style={[styles.convertButton, (!amount || loading) && styles.convertButtonDisabled]} 
-                  onPress={fetchExchangeRate}
-                  disabled={!amount || loading}
-                  >
-                    {loading ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <Text style={styles.swapButtonText}>
-                        Converter
-                      </Text> 
-                    )}
-                  </TouchableOpacity>
-                  <ResultCard 
-                    amount={amount} 
-                    fromCurrency={fromCurrency} 
-                    toCurrency={toCurrency} 
-                    exchangeRate={exchangeRate} 
-                    result={result}
-                    currencies={currencies}
-                  />
-            </View>
-        </View>
-        <Text style={{ fontSize: 14, color: '#888', marginTop: 20 }}>
-            ({tempoAtual.toLocaleTimeString()})
-        </Text>
-      </ScrollView>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+      {/* Tab Bar Customizada (3 Ícones) */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Início')}>
+          <MaterialIcons name="currency-exchange" size={24} color={currentTab === 'Início' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'Início' ? colors.primary : colors.textSecondary }]}>Início</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Perfil')}>
+          <MaterialIcons name="account-circle" size={24} color={currentTab === 'Perfil' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'Perfil' ? colors.primary : colors.textSecondary }]}>Perfil</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Config')}>
+          <MaterialIcons name="settings" size={24} color={currentTab === 'Config' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'Config' ? colors.primary : colors.textSecondary }]}>Ajustes</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: colors.cardBackground,
+    borderTopColor: colors.background,
+    borderTopWidth: 2,
+    height: 65,
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontFamily: 'Inter_500Medium',
+    marginTop: 4,
+  }
+});

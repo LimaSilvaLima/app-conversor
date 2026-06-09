@@ -1,12 +1,15 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../styles/colors';
+import { t, useLanguage } from '../localization';
 
 export default function ProfileScreen() {
+  const { locale } = useLanguage();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Meu Perfil</Text>
+        <Text style={styles.headerTitle}>{t('profile.title')}</Text>
       </View>
 
       <View style={styles.authContainer}>
@@ -14,18 +17,16 @@ export default function ProfileScreen() {
           <MaterialIcons name="person" size={64} color={colors.inputBackground} />
         </View>
         
-        <Text style={styles.title}>Sincronize seus dados</Text>
-        <Text style={styles.subtitle}>
-          Crie uma conta para salvar suas moedas favoritas na nuvem e acessá-las de qualquer dispositivo.
-        </Text>
+        <Text style={styles.title}>{t('profile.syncTitle')}</Text>
+        <Text style={styles.subtitle}>{t('profile.syncSubtitle')}</Text>
 
         {/* TODO: Integração futura com rotas /login e /register do backend */}
         <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
-          <Text style={styles.primaryButtonText}>Entrar na Conta</Text>
+          <Text style={styles.primaryButtonText}>{t('profile.signIn')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8}>
-          <Text style={styles.secondaryButtonText}>Criar nova conta</Text>
+          <Text style={styles.secondaryButtonText}>{t('profile.signUp')}</Text>
         </TouchableOpacity>
       </View>
     </View>

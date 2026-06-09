@@ -10,24 +10,18 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 
 import { colors } from './src/styles/colors';
+import { LanguageProvider, useLanguage, t } from './src/localization';
 
-export default function App() {
-  const [currentTab, setCurrentTab] = useState('Início');
-  
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) return null;
+function MainApp() {
+  const { locale } = useLanguage(); // re-render quando idioma muda
+  const [currentTab, setCurrentTab] = useState('home');
 
   // Função para renderizar a tela correta baseada no estado
   const renderScreen = () => {
     switch (currentTab) {
-      case 'Início': return <HomeScreen />;
-      case 'Perfil': return <ProfileScreen />;
-      case 'Config': return <SettingsScreen />;
+      case 'home': return <HomeScreen />;
+      case 'profile': return <ProfileScreen />;
+      case 'settings': return <SettingsScreen />;
       default: return <HomeScreen />;
     }
   };
@@ -43,22 +37,38 @@ export default function App() {
 
       {/* Tab Bar Customizada (3 Ícones) */}
       <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Início')}>
-          <MaterialIcons name="currency-exchange" size={24} color={currentTab === 'Início' ? colors.primary : colors.textSecondary} />
-          <Text style={[styles.tabLabel, { color: currentTab === 'Início' ? colors.primary : colors.textSecondary }]}>Início</Text>
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('home')}>
+          <MaterialIcons name="currency-exchange" size={24} color={currentTab === 'home' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'home' ? colors.primary : colors.textSecondary }]}>{t('tab.home')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Perfil')}>
-          <MaterialIcons name="account-circle" size={24} color={currentTab === 'Perfil' ? colors.primary : colors.textSecondary} />
-          <Text style={[styles.tabLabel, { color: currentTab === 'Perfil' ? colors.primary : colors.textSecondary }]}>Perfil</Text>
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('profile')}>
+          <MaterialIcons name="account-circle" size={24} color={currentTab === 'profile' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'profile' ? colors.primary : colors.textSecondary }]}>{t('tab.profile')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('Config')}>
-          <MaterialIcons name="settings" size={24} color={currentTab === 'Config' ? colors.primary : colors.textSecondary} />
-          <Text style={[styles.tabLabel, { color: currentTab === 'Config' ? colors.primary : colors.textSecondary }]}>Ajustes</Text>
+        <TouchableOpacity style={styles.tabItem} activeOpacity={0.7} onPress={() => setCurrentTab('settings')}>
+          <MaterialIcons name="settings" size={24} color={currentTab === 'settings' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.tabLabel, { color: currentTab === 'settings' ? colors.primary : colors.textSecondary }]}>{t('tab.settings')}</Text>
         </TouchableOpacity>
       </View>
     </View>
+  );
+}
+
+export default function App() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+  });
+
+  if (!fontsLoaded) return null;
+
+  return (
+    <LanguageProvider>
+      <MainApp />
+    </LanguageProvider>
   );
 }
 

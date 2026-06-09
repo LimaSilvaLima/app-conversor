@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
         marginBottom: 16,
     },
     label: {
+        fontFamily: 'Inter_500Medium',
         color: colors.textSecondary,
         fontSize: 14,
         marginBottom: 8,
@@ -13,10 +14,10 @@ export const styles = StyleSheet.create({
     input: {
         backgroundColor: colors.inputBackground,
         color: colors.text,
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontFamily: 'Inter_400Regular', 
         paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 8,
+        paddingVertical: 14,
+        borderRadius: 12,
     },
 });

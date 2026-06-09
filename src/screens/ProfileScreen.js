@@ -1,8 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../styles/colors';
+import { AuthContext } from '../contexts/AuthContext';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
+  const { signed, signOut } = useContext(AuthContext);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -11,22 +15,40 @@ export default function ProfileScreen() {
 
       <View style={styles.authContainer}>
         <View style={styles.avatarPlaceholder}>
-          <MaterialIcons name="person" size={64} color={colors.inputBackground} />
+          <MaterialIcons name="person" size={64} color={signed ? colors.primary : colors.inputBackground} />
         </View>
         
-        <Text style={styles.title}>Sincronize seus dados</Text>
-        <Text style={styles.subtitle}>
-          Crie uma conta para salvar suas moedas favoritas na nuvem e acessá-las de qualquer dispositivo.
-        </Text>
+        {signed ? (
+          // --- VISÃO DO USUÁRIO LOGADO ---
+          <>
+            <Text style={styles.title}>Conta Sincronizada!</Text>
+            <Text style={styles.subtitle}>
+              Seus favoritos estão sendo salvos de forma segura na nuvem da Converti.
+            </Text>
 
-        {/* TODO: Integração futura com rotas /login e /register do backend */}
-        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
-          <Text style={styles.primaryButtonText}>Entrar na Conta</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8} onPress={signOut}>
+              <Text style={[styles.secondaryButtonText, { color: '#ef4444' }]}>
+                Sair da Conta
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          // --- VISÃO DO VISITANTE ---
+          <>
+            <Text style={styles.title}>Sincronize seus dados</Text>
+            <Text style={styles.subtitle}>
+              Crie uma conta para salvar suas moedas favoritas na nuvem e acessá-las de qualquer dispositivo.
+            </Text>
 
-        <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8}>
-          <Text style={styles.secondaryButtonText}>Criar nova conta</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.primaryButtonText}>Entrar na Conta</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8} onPress={() => navigation.navigate('Register')}>
+              <Text style={styles.secondaryButtonText}>Criar nova conta</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );

@@ -18,7 +18,7 @@
       "package": "com.faculdade.converti",
       "adaptiveIcon": {
         "backgroundColor": "#212738",
-        "foregroundImage": "./assets/converti_icon_white.png"
+        "foregroundImage": "./assets/background/converti_icon_white.png"
       }
     },
     "web": {

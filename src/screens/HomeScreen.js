@@ -1,35 +1,49 @@
-import { useState, useEffect } from 'react';
-import { Text, KeyboardAvoidingView, Platform, View, TouchableOpacity, Dimensions, ScrollView, TextInput, Image } from 'react-native';
+import { useState, useEffect, useContext } from 'react';
+import { Text, View, TouchableOpacity, Dimensions, ScrollView, TextInput, Image, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
+import * as Clipboard from 'expo-clipboard';
 
 import Button from '../components/Button';
 import styles from '../App.styles';
 import { colors } from '../styles/colors';
 import { currencies } from '../constants/currencies';
 import { exchangeRateApi } from '../services/api';
-import { convertCurrency } from '../utils/convertCurrency';
 import { generateHistoryData } from '../utils/generateHistory';
+import { t, useLanguage } from '../localization';
+import { AuthContext } from '../contexts/AuthContext';
+import backend from '../services/backend';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
-  const [amount, setAmount] = useState('1');
+  const { locale } = useLanguage();
+  const { signed } = useContext(AuthContext);
+
   const [fromCurrency, setFromCurrency] = useState('BRL');
   const [toCurrency, setToCurrency] = useState('USD');
   
-  const [rates, setRates] = useState(null);
-  const [favorites, setFavorites] = useState([]);
-  const [historyData, setHistoryData] = useState(null);
+  const [sendAmount, setSendAmount] = useState('1');
+  const [receiveAmount, setReceiveAmount] = useState('');
+  const [activeInput, setActiveInput] = useState('send'); 
   
-  // Status de Conexão e Tempo
+  const [rates, setRates] = useState(null);
+  
+  // Novos estados para gerenciar a integração com a API
+  const [favorites, setFavorites] = useState([]);
+  const [favoriteObjects, setFavoriteObjects] = useState([]); 
+  
+  const [historyData, setHistoryData] = useState(null);
   const [isOnline, setIsOnline] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
+  const currentRate = rates ? rates[toCurrency] : null;
+
+  // Carrega os favoritos sempre que o status de login mudar
   useEffect(() => {
     loadFavorites();
-  }, []);
+  }, [signed]);
 
   useEffect(() => {
     async function fetchRates() {
@@ -45,8 +59,25 @@ export default function HomeScreen() {
     fetchRates();
   }, [fromCurrency]);
 
-  const currentRate = rates ? rates[toCurrency] : null;
-  const result = (amount && !isNaN(amount) && currentRate) ? convertCurrency(amount, currentRate) : '0.00';
+  useEffect(() => {
+    if (currentRate) {
+      if (activeInput === 'send') {
+        const parsed = parseFloat(sendAmount.replace(',', '.'));
+        if (!isNaN(parsed)) {
+          setReceiveAmount((parsed * currentRate).toFixed(2));
+        } else {
+          setReceiveAmount('');
+        }
+      } else if (activeInput === 'receive') {
+        const parsed = parseFloat(receiveAmount.replace(',', '.'));
+        if (!isNaN(parsed)) {
+          setSendAmount((parsed / currentRate).toFixed(2));
+        } else {
+          setSendAmount('');
+        }
+      }
+    }
+  }, [sendAmount, receiveAmount, currentRate, activeInput]);
 
   useEffect(() => {
     if (currentRate) {
@@ -54,18 +85,63 @@ export default function HomeScreen() {
     }
   }, [currentRate]);
 
+  // Integração GET com a OCI
   async function loadFavorites() {
+    if (signed) {
+      try {
+        const response = await backend.get('/favorites/');
+        const favsStrings = response.data.map(f => `${f.from_currency}-${f.to_currency}`);
+        
+        setFavorites(favsStrings);
+        setFavoriteObjects(response.data);
+        AsyncStorage.setItem('@converti_favorites', JSON.stringify(favsStrings)).catch(()=>{});
+      } catch (error) {
+        console.log('Erro ao buscar favoritos da API:', error);
+        loadLocalFavorites();
+      }
+    } else {
+      loadLocalFavorites();
+    }
+  }
+
+  async function loadLocalFavorites() {
     try {
       const stored = await AsyncStorage.getItem('@converti_favorites');
       if (stored) setFavorites(JSON.parse(stored));
     } catch (error) {}
   }
 
+  // Integração POST e DELETE com a OCI
   async function toggleFavorite() {
     const pair = `${fromCurrency}-${toCurrency}`;
-    let newFavs = favorites.includes(pair) ? favorites.filter(fav => fav !== pair) : [...favorites, pair];
+    const isFav = favorites.includes(pair);
+    
+    // Atualiza a UI imediatamente (Optimistic UI)
+    let newFavs = isFav ? favorites.filter(fav => fav !== pair) : [...favorites, pair];
     setFavorites(newFavs);
     AsyncStorage.setItem('@converti_favorites', JSON.stringify(newFavs)).catch(()=>{});
+    
+    if (signed) {
+      try {
+        if (isFav) {
+          // Se já era favorito, busca o ID e deleta
+          const favObj = favoriteObjects.find(f => f.from_currency === fromCurrency && f.to_currency === toCurrency);
+          if (favObj) {
+            await backend.delete(`/favorites/${favObj.id}`);
+            setFavoriteObjects(prev => prev.filter(f => f.id !== favObj.id));
+          }
+        } else {
+          // Se não era, cria um novo no banco
+          const response = await backend.post('/favorites/', { 
+            from_currency: fromCurrency, 
+            to_currency: toCurrency 
+          });
+          setFavoriteObjects(prev => [...prev, response.data]);
+        }
+      } catch (error) {
+        console.log('Erro ao sincronizar favorito na OCI:', error);
+      }
+    }
   }
 
   function applyFavorite(pair) {
@@ -74,18 +150,27 @@ export default function HomeScreen() {
     setToCurrency(to);
   }
 
+  const copyToClipboard = async (text) => {
+    if (!text) return;
+    await Clipboard.setStringAsync(text);
+    Alert.alert("Copiado!", `O valor ${text} foi copiado para a área de transferência.`);
+  };
+
   const isFavorited = favorites.includes(`${fromCurrency}-${toCurrency}`);
+  const fromSymbol = currencies.find(c => c.code === fromCurrency)?.symbol || fromCurrency;
   const toSymbol = currencies.find(c => c.code === toCurrency)?.symbol || toCurrency;
-  
-  // Formatação do tempo para o formato HH:MM
   const timeString = lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      {/* Container Fixo. */}
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      bounces={false}
+    >
       <View style={styles.content}>
         
-        {/* Header com Status */}
         <View style={styles.headerRow}>
           <Image 
             source={require('../../assets/background/logo_white.png')} 
@@ -94,13 +179,10 @@ export default function HomeScreen() {
           />
           <View style={styles.statusIndicator}>
             <View style={[styles.statusDot, { backgroundColor: isOnline ? colors.secondary : '#94a3b8' }]} />
-            <Text style={styles.statusText}>
-              {isOnline ? 'Tempo real' : `Atualizado ${timeString}`}
-            </Text>
+              <Text style={styles.statusText}>{isOnline ? t('home.realtime') : `${t('home.updated')} ${timeString}`}</Text>
           </View>
         </View>
 
-        {/* Chips de Acesso Rápido */}
         {favorites.length > 0 && (
           <View style={styles.favoritesSection}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -114,22 +196,29 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Card de Conversão */}
         <View style={styles.exchangeCard}>
           <TouchableOpacity onPress={toggleFavorite} style={styles.cardHeaderInfo}>
             <MaterialIcons name={isFavorited ? "star" : "star-border"} size={28} color={isFavorited ? colors.secondary : colors.disabled} />
           </TouchableOpacity>
 
           <View style={styles.inputSection}>
-            <Text style={styles.label}>Você envia</Text>
-            <TextInput 
-              style={styles.hugeInput}
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
-              placeholder="0.00"
-              placeholderTextColor={colors.textSecondary}
-            />
+            <Text style={styles.label}>{t('home.send')}</Text>
+            
+            <View style={localStyles.inputRow}>
+              <Text style={localStyles.currencySymbol}>{fromSymbol}</Text>
+              <TextInput 
+                style={[styles.hugeInput, { flex: 1, marginBottom: 0 }]}
+                value={sendAmount}
+                onChangeText={(val) => { setActiveInput('send'); setSendAmount(val); }}
+                keyboardType="numeric"
+                placeholder="0.00"
+                placeholderTextColor={colors.textSecondary}
+              />
+              <TouchableOpacity onPress={() => copyToClipboard(sendAmount)} style={localStyles.copyButton}>
+                <MaterialIcons name="content-copy" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyScrollContent}>
               {currencies.map((currency) => (
                 <Button key={currency.code} currency={currency} onPress={() => setFromCurrency(currency.code)} isSelected={fromCurrency === currency.code} variant="primary" />
@@ -144,22 +233,36 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.inputSection}>
-            <Text style={styles.label}>Você recebe</Text>
-            <Text style={styles.hugeResult} numberOfLines={1} adjustsFontSizeToFit>{toSymbol} {result}</Text>
+            <Text style={styles.label}>{t('home.receive')}</Text>
+            
+            <View style={localStyles.inputRow}>
+              <Text style={[localStyles.currencySymbol, { color: colors.primary }]}>{toSymbol}</Text>
+              <TextInput 
+                style={[styles.hugeInput, { flex: 1, color: colors.primary, marginBottom: 0 }]}
+                value={receiveAmount}
+                onChangeText={(val) => { setActiveInput('receive'); setReceiveAmount(val); }}
+                keyboardType="numeric"
+                placeholder="0.00"
+                placeholderTextColor={colors.primary + '80'}
+              />
+              <TouchableOpacity onPress={() => copyToClipboard(receiveAmount)} style={localStyles.copyButton}>
+                <MaterialIcons name="content-copy" size={20} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyScrollContent}>
               {currencies.map((currency) => (
-                <Button variant="secondary" key={currency.code} currency={currency} onPress={() => setToCurrency(currency.code)} isSelected={toCurrency === currency.code} />
+                <Button variant="primary" key={currency.code} currency={currency} onPress={() => setToCurrency(currency.code)} isSelected={toCurrency === currency.code} />
               ))}
             </ScrollView>
           </View>
         </View>
 
-        {/* Gráfico Autoajustável com Dias e Valores */}
         {historyData && (
           <View style={styles.chartCompactContainer}>
             <View style={styles.chartHeader}>
-              <Text style={styles.chartTitle}>Últimos 30 Dias</Text>
-              <Text style={styles.chartRate}>1 {fromCurrency} = {currentRate?.toFixed(4)} {toCurrency}</Text>
+              <Text style={styles.chartTitle}>{t('home.last30days')}</Text>
+              <Text style={styles.chartRate}>1 {fromCurrency} = {currentRate?.toFixed(3)} {toCurrency}</Text>
             </View>
             
             <View style={styles.chartWrapper}>
@@ -186,15 +289,33 @@ export default function HomeScreen() {
                   propsForBackgroundLines: { strokeDasharray: "", stroke: 'rgba(255,255,255,0.05)' } 
                 }}
                 bezier
-                style={{ 
-                  marginVertical: 8,
-                }} 
+                style={{ marginVertical: 8 }} 
               />
             </View>
           </View>
         )}
 
       </View>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
+
+const localStyles = StyleSheet.create({
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    height: 48,
+  },
+  currencySymbol: {
+    fontFamily: 'Inter_700Bold',
+    color: colors.text,
+    fontSize: 32,
+    marginRight: 8,
+    marginTop: -4, 
+  },
+  copyButton: {
+    padding: 8,
+    marginLeft: 8,
+  }
+});

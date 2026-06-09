@@ -3,29 +3,29 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } fr
 import { Input } from '../components/Input';
 import { colors } from '../styles/colors';
 import backend from '../services/backend';
+import { t, useLanguage } from '../localization';
 
 export default function ResetPasswordScreen({ route, navigation }) {
-  const { email } = route.params; // Pega o e-mail passado pela tela anterior
+  const { locale } = useLanguage();
+  const { email } = route.params;
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handlePasswordReset() {
     if (!otp || !newPassword) {
-      Alert.alert('Aviso', 'Preencha o código e a nova senha.');
+      Alert.alert(t('auth.alerts.warning'), t('auth.alerts.resetWarning'));
       return;
     }
 
     setLoading(true);
     try {
       await backend.post('/auth/reset-password', { email, otp, new_password: newPassword });
-      Alert.alert('Sucesso', 'Sua senha foi alterada com sucesso!');
-      
-      // Volta tudo até a tela de Login
+      Alert.alert(t('auth.alerts.success'), t('auth.alerts.resetSuccess'));
       navigation.navigate('Login');
     } catch (error) {
-      const message = error.response?.data?.detail || "Erro ao redefinir senha.";
-      Alert.alert('Erro', message);
+      const message = error.response?.data?.detail || t('auth.alerts.resetError');
+      Alert.alert(t('auth.alerts.error'), message);
     } finally {
       setLoading(false);
     }
@@ -33,14 +33,14 @@ export default function ResetPasswordScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Nova Senha</Text>
-      <Text style={styles.subtitle}>Digite o código recebido no e-mail {email}</Text>
+      <Text style={styles.title}>{t('auth.newPasswordTitle')}</Text>
+      <Text style={styles.subtitle}>{t('auth.newPasswordSubtitle')} {email}</Text>
       
-      <Input label="Código de 6 dígitos" value={otp} onChangeText={setOtp} keyboardType="numeric" placeholder="000000" />
-      <Input label="Nova Senha" value={newPassword} onChangeText={setNewPassword} secureTextEntry={true} placeholder="******" />
+      <Input label={t('auth.otpLabel')} value={otp} onChangeText={setOtp} keyboardType="numeric" placeholder={t('auth.otpPlaceholder')} />
+      <Input label={t('auth.newPasswordTitle')} value={newPassword} onChangeText={setNewPassword} secureTextEntry={true} placeholder={t('auth.passwordPlaceholder')} />
 
       <TouchableOpacity style={styles.primaryButton} onPress={handlePasswordReset} disabled={loading}>
-        {loading ? <ActivityIndicator color={colors.background} /> : <Text style={styles.primaryButtonText}>Salvar nova senha</Text>}
+        {loading ? <ActivityIndicator color={colors.background} /> : <Text style={styles.primaryButtonText}>{t('auth.savePasswordBtn')}</Text>}
       </TouchableOpacity>
     </View>
   );
@@ -51,7 +51,5 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 28, fontFamily: 'Inter_700Bold', marginBottom: 8, textAlign: 'center' },
   subtitle: { color: colors.textSecondary, fontSize: 14, fontFamily: 'Inter_400Regular', marginBottom: 32, textAlign: 'center' },
   primaryButton: { backgroundColor: colors.primary, paddingVertical: 16, borderRadius: 16, alignItems: 'center', marginBottom: 16 },
-  primaryButtonText: { color: colors.background, fontSize: 16, fontFamily: 'Inter_700Bold' },
-  secondaryButton: { backgroundColor: 'transparent', paddingVertical: 16, borderRadius: 16, alignItems: 'center', borderWidth: 2, borderColor: colors.cardBackground },
-  secondaryButtonText: { color: colors.text, fontSize: 16, fontFamily: 'Inter_700Bold' }
+  primaryButtonText: { color: colors.background, fontSize: 16, fontFamily: 'Inter_700Bold' }
 });

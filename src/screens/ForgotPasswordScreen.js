@@ -3,28 +3,26 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } fr
 import { Input } from '../components/Input';
 import { colors } from '../styles/colors';
 import backend from '../services/backend';
+import { t, useLanguage } from '../localization';
 
 export default function ForgotPasswordScreen({ navigation }) {
+  const { locale } = useLanguage();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleResetRequest() {
     if (!email) {
-      Alert.alert('Aviso', 'Digite seu e-mail.');
+      Alert.alert(t('auth.alerts.warning'), t('auth.alerts.forgotWarning'));
       return;
     }
 
     setLoading(true);
     try {
       await backend.post('/auth/forgot-password', { email });
-      Alert.alert('Sucesso!', 'Se o e-mail existir, você receberá um código de 6 dígitos.');
-      
-      // Envia o usuário para a tela de digitar o OTP e a nova senha
+      Alert.alert(t('auth.alerts.success'), t('auth.alerts.forgotSuccess'));
       navigation.navigate('ResetPassword', { email }); 
     } catch (error) {
-      // Como configuramos no backend, ele nunca diz se o e-mail não existe por segurança
-      // Mas se der erro 429 (Rate Limit), cai aqui
-      Alert.alert('Aviso', 'Muitas tentativas. Tente novamente mais tarde.');
+      Alert.alert(t('auth.alerts.warning'), t('auth.alerts.forgotError'));
     } finally {
       setLoading(false);
     }
@@ -32,17 +30,17 @@ export default function ForgotPasswordScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Recuperar Senha</Text>
-      <Text style={styles.subtitle}>Enviaremos um código para o seu e-mail.</Text>
+      <Text style={styles.title}>{t('auth.forgotTitle')}</Text>
+      <Text style={styles.subtitle}>{t('auth.forgotSubtitle')}</Text>
       
-      <Input label="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" placeholder="seu@email.com" />
+      <Input label={t('auth.email')} value={email} onChangeText={setEmail} keyboardType="email-address" placeholder={t('auth.emailPlaceholder')} />
 
       <TouchableOpacity style={styles.primaryButton} onPress={handleResetRequest} disabled={loading}>
-        {loading ? <ActivityIndicator color={colors.background} /> : <Text style={styles.primaryButtonText}>Enviar Código</Text>}
+        {loading ? <ActivityIndicator color={colors.background} /> : <Text style={styles.primaryButtonText}>{t('auth.sendCodeBtn')}</Text>}
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.secondaryButtonText}>Voltar</Text>
+        <Text style={styles.secondaryButtonText}>{t('auth.backBtn')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -38,24 +38,24 @@ export default function ProfileScreen({ navigation }) {
 
     return (
       <>
-        <Text style={styles.userName}>{user?.nome || '...'}</Text>
+        <Text style={styles.userName}>{user?.nome || t('profile.loading')}</Text>
         <Text style={styles.userEmail}>{user?.email || ''}</Text>
 
         <View style={styles.badge}>
           <MaterialIcons name="cloud-done" size={16} color={colors.primary} style={styles.badgeIcon} />
-          <Text style={styles.badgeText}>Dados Sincronizados</Text>
+          <Text style={styles.badgeText}>{t('profile.syncedData')}</Text>
         </View>
 
         <View style={styles.menuContainer}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ForgotPassword')}>
             <MaterialIcons name="lock-reset" size={24} color={colors.text} style={styles.menuIcon} />
-            <Text style={styles.menuItemText}>Redefinir Senha</Text>
+            <Text style={styles.menuItemText}>{t('profile.resetPassword')}</Text>
             <MaterialIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.menuItem, styles.menuItemNoBorder]} onPress={signOut}>
             <MaterialIcons name="logout" size={24} color="#ef4444" style={styles.menuIcon} />
-            <Text style={[styles.menuItemText, styles.dangerText]}>Sair da Conta</Text>
+            <Text style={[styles.menuItemText, styles.dangerText]}>{t('profile.logout')}</Text>
           </TouchableOpacity>
         </View>
       </>

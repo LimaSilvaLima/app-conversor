@@ -15,6 +15,7 @@ import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import VerifyScreen from './src/screens/VerifyScreen';
+import LegalScreen from './src/screens/LegalScreen';
 
 import { colors } from './src/styles/colors';
 import { AuthProvider, AuthContext } from './src/contexts/AuthContext';
@@ -76,6 +77,7 @@ function Routes() {
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Verify" component={VerifyScreen} />
+      <Stack.Screen name="Legal" component={LegalScreen} />
     </Stack.Navigator>
   );
 }

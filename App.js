@@ -18,12 +18,14 @@ import VerifyScreen from './src/screens/VerifyScreen';
 
 import { colors } from './src/styles/colors';
 import { AuthProvider, AuthContext } from './src/contexts/AuthContext';
+import { LanguageProvider, useLanguage, t } from './src/localization';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// As Abas Principais do App
 function AppTabs() {
+  const { locale } = useLanguage();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -48,14 +50,13 @@ function AppTabs() {
         tabBarLabelStyle: { fontFamily: 'Inter_500Medium', fontSize: 11 }
       })}
     >
-      <Tab.Screen name="Início" component={HomeScreen} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
-      <Tab.Screen name="Ajustes" component={SettingsScreen} />
+      <Tab.Screen name="Início" component={HomeScreen} options={{ tabBarLabel: t('tab.home') }} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} options={{ tabBarLabel: t('tab.profile') }} />
+      <Tab.Screen name="Ajustes" component={SettingsScreen} options={{ tabBarLabel: t('tab.settings') }} />
     </Tab.Navigator>
   );
 }
 
-// Controle Inteligente de Rotas
 function Routes() {
   const { isLoading } = useContext(AuthContext);
 
@@ -69,10 +70,7 @@ function Routes() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* O aplicativo sempre abre nas Abas (HomeScreen) */}
       <Stack.Screen name="MainTabs" component={AppTabs} />
-      
-      {/* Telas de Autenticação empilhadas "por cima" quando chamadas */}
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
@@ -82,29 +80,31 @@ function Routes() {
   );
 }
 
-// Raiz do Aplicativo
 export default function App() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_700Bold,
   });
-  const DarkThemeConverti = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.background, // Mata qualquer fundo branco residual
-  },
-};
+
+  const appTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors.background,
+    },
+  };
 
   if (!fontsLoaded) return null;
 
   return (
-    <NavigationContainer theme={DarkThemeConverti}>
-      <AuthProvider>
-        <StatusBar style="light" />
-        <Routes />
-      </AuthProvider>
-    </NavigationContainer>
+    <LanguageProvider>
+      <NavigationContainer theme={appTheme}>
+        <AuthProvider>
+          <StatusBar style="light" />
+          <Routes />
+        </AuthProvider>
+      </NavigationContainer>
+    </LanguageProvider>
   );
 }

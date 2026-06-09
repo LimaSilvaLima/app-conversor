@@ -11,10 +11,12 @@ import { currencies } from '../constants/currencies';
 import { exchangeRateApi } from '../services/api';
 import { convertCurrency } from '../utils/convertCurrency';
 import { generateHistoryData } from '../utils/generateHistory';
+import { t, useLanguage } from '../localization';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
+  const { locale } = useLanguage();
   const [amount, setAmount] = useState('1');
   const [fromCurrency, setFromCurrency] = useState('BRL');
   const [toCurrency, setToCurrency] = useState('USD');
@@ -94,9 +96,7 @@ export default function HomeScreen() {
           />
           <View style={styles.statusIndicator}>
             <View style={[styles.statusDot, { backgroundColor: isOnline ? colors.secondary : '#94a3b8' }]} />
-            <Text style={styles.statusText}>
-              {isOnline ? 'Tempo real' : `Atualizado ${timeString}`}
-            </Text>
+              <Text style={styles.statusText}>{isOnline ? t('home.realtime') : `${t('home.updated')} ${timeString}`}</Text>
           </View>
         </View>
 
@@ -121,7 +121,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <View style={styles.inputSection}>
-            <Text style={styles.label}>Você envia</Text>
+            <Text style={styles.label}>{t('home.send')}</Text>
             <TextInput 
               style={styles.hugeInput}
               value={amount}
@@ -144,7 +144,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.inputSection}>
-            <Text style={styles.label}>Você recebe</Text>
+            <Text style={styles.label}>{t('home.receive')}</Text>
             <Text style={styles.hugeResult} numberOfLines={1} adjustsFontSizeToFit>{toSymbol} {result}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyScrollContent}>
               {currencies.map((currency) => (
@@ -158,7 +158,7 @@ export default function HomeScreen() {
         {historyData && (
           <View style={styles.chartCompactContainer}>
             <View style={styles.chartHeader}>
-              <Text style={styles.chartTitle}>Últimos 30 Dias</Text>
+              <Text style={styles.chartTitle}>{t('home.last30days')}</Text>
               <Text style={styles.chartRate}>1 {fromCurrency} = {currentRate?.toFixed(4)} {toCurrency}</Text>
             </View>
             

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "app-conversor",
-    "slug": "app-conversor",
+    "name": "Converti",
+    "slug": "converti",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/converti_icon_white.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/background/logo_white.png",
@@ -15,18 +15,23 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.faculdade.converti",
       "adaptiveIcon": {
         "backgroundColor": "#212738",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/converti_icon_white.png"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-localization"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "45e502cd-a1de-40b4-80d5-a0940ada1eae"
+      }
+    }
   }
 }
